@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Dashboard Prototype</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    header {
+      background-color: #004080;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .container {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    iframe {
+      width: 100%;
+      border: none;
+      height: 400px;
+    }
+    .dark-mode {
+      background-color: #1e1e1e;
+      color: #ddd;
+    }
+    .dark-mode header {
+      background-color: #222;
+    }
+    .dark-mode .card {
+      background: #2e2e2e;
+      color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Market Dashboard</h1>
+    <button class="theme-toggle" onclick="toggleTheme()">Day/Night</button>
+  </header>
+  <div class="container">
+    <div class="card">
+      <h2>SET Investor Types</h2>
+      <iframe src="https://www.set.or.th/en/market/statistics/investor-type"></iframe>
+      <p>If not visible, <a href="https://www.set.or.th/en/market/statistics/investor-type" target="_blank">open here</a>.</p>
+    </div>
+    <div class="card">
+      <h2>Gold Price (XAUUSD)</h2>
+      <div class="tradingview-widget-container">
+        <div id="tradingview_gold"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Economic Calendar</h2>
+      <div class="tradingview-widget-container">
+        <div id="economic_calendar"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+  {
+    "symbol": "OANDA:XAUUSD",
+    "width": "100%",
+    "height": "300",
+    "locale": "en",
+    "dateRange": "1D",
+    "colorTheme": "light",
+    "trendLineColor": "rgba(41, 98, 255, 1)",
+    "underLineColor": "rgba(41, 98, 255, 0.3)",
+    "isTransparent": false,
+    "autosize": true,
+    "largeChartUrl": ""
+  }
+  </script>
+
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+  {
+    "colorTheme": "light",
+    "isTransparent": false,
+    "width": "100%",
+    "height": "400",
+    "locale": "en",
+    "importanceFilter": "-1,0,1",
+    "countryFilter": "us,th,jp"
+  }
+  </script>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
+    window.onload = function() {
+      if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+      }
+    };
+  </script>
+</body>
+</html>
