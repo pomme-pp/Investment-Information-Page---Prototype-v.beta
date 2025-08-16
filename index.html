@@ -1,134 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Market Page v0.4</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market Page v0.5 — Minimal</title>
+  <meta name="description" content="Minimal market dashboard with sidebar, news, products, calendar, and SET summary." />
   <style>
-    body {
-      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background: var(--bg); color: var(--fg); transition: background 0.3s, color 0.3s;
-    }
     :root {
-      --bg: #ffffff; --fg: #111; --accent: #0077cc; --sidebar-bg: #f7f7f7;
+      --bg: #0f1115; --fg:#e6e8ef; --muted:#8b92a6; --card:#151a23; --border:#252b3a; --accent:#7aa2f7;
+      --side:#10141c; --link:#9ab6ff;
     }
-    body.dark {
-      --bg: #222; --fg: #eee; --accent: #3399ff; --sidebar-bg: #333;
+    [data-theme="light"] {
+      --bg:#ffffff; --fg:#111; --muted:#5b6170; --card:#ffffff; --border:#e6e8ef; --accent:#1f5eff;
+      --side:#f7f8fb; --link:#165dff;
     }
-    .container { display: flex; height: 100vh; }
-    .sidebar {
-      width: 200px; background: var(--sidebar-bg); padding: 1rem 0;
-      display: flex; flex-direction: column; gap: 1rem;
-    }
-    .sidebar a {
-      color: var(--fg); text-decoration: none; padding: 0.5rem 1rem;
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .sidebar a:hover { background: var(--accent); color: #fff; }
-    .content { flex: 1; overflow-y: auto; padding: 1rem 2rem; }
-    h2 { margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 0.3rem; }
-    .news-item {
-      display: flex; align-items: center; gap: 0.5rem; margin: 0.3rem 0;
-    }
-    .news-item img { width: 16px; height: 16px; }
-    .products-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;
-    }
-    .card { border: 1px solid #ccc; padding: 0.5rem; border-radius: 4px; background: var(--sidebar-bg); }
-    .theme-toggle { margin: 1rem; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font:15.5px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;background:var(--bg)}
+    h1{margin:0;font-size:18px} h2{margin:0 0 8px 0;font-size:16px} h3{margin:0 0 6px 0;font-size:14px}
+    .tag{color:var(--muted);font-size:12px}
+    .layout{display:grid;grid-template-columns: 220px 1fr; min-height:100vh}
+    nav.side{background:var(--side);border-right:1px solid var(--border);padding:12px;position:sticky;top:54px;height:calc(100vh - 54px);overflow:auto}
+    nav.side .brand{font-weight:700;margin:0 0 8px 0}
+    nav.side a.nav{display:block;padding:8px 10px;border-radius:8px;color:inherit}
+    nav.side a.nav:hover{background:rgba(122,162,247,0.12)}
+    main{padding:16px}
+    .grid{display:grid;gap:16px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
+    .news-item{display:flex;align-items:center;gap:8px;margin:6px 0}
+    .news-item img{width:16px;height:16px;border-radius:3px}
+    .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .prod-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px}
+    .prod-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .prod-name{font-weight:600}
+    .toolbar{display:flex;gap:8px;align-items:center}
+    button{background:transparent;border:1px solid var(--border);border-radius:8px;color:inherit;padding:8px 10px;cursor:pointer}
+    .link-btn{border:1px solid var(--border);padding:6px 10px;border-radius:8px;text-decoration:none;color:inherit;display:inline-block}
+    .iframeWrap{position:relative;width:100%;height:560px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg)}
+    .iframeFallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--muted)}
+    footer{color:var(--muted);text-align:center;padding:18px;border-top:1px solid var(--border);margin-top:20px}
+    .row{display:grid;gap:12px}
+    .two{grid-template-columns:1fr 1fr}
+    @media(max-width:980px){.layout{grid-template-columns:1fr} nav.side{position:static;height:auto} .two{grid-template-columns:1fr}}
+    textarea{width:100%;min-height:140px;border:1px solid var(--border);background:var(--bg);color:var(--fg);border-radius:8px;padding:10px;font:14px/1.5 system-ui}
+    .note{font-size:12px;color:var(--muted)}
   </style>
 </head>
-<body>
-<div class="container">
-  <div class="sidebar">
-    <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
-    <a href="#news">📰 News</a>
-    <a href="#products">📈 Products</a>
-    <a href="#calendar">📅 Calendar</a>
-    <a href="#summary">📊 Market Summary</a>
+<body data-theme="dark">
+  <header>
+    <div>
+      <h1>My Market Page — v0.5</h1>
+      <div class="tag">Timezone: Asia/Bangkok • Minimal layout</div>
+    </div>
+    <div class="toolbar">
+      <button id="theme">Day/Night</button>
+      <span class="tag">Local time: <span id="now"></span></span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="side">
+      <div class="brand">Menu</div>
+      <a class="nav" href="#news" target="_self">📰 News</a>
+      <a class="nav" href="#products" target="_self">📈 Products</a>
+      <a class="nav" href="#calendar" target="_self">📅 Economic Calendar</a>
+      <a class="nav" href="#summary" target="_self">📊 Market Summary</a>
+      <a class="nav" href="#plan" target="_self">📝 Daily Plan</a>
+    </nav>
+
+    <main>
+      <div class="grid">
+
+        <!-- NEWS -->
+        <section id="news" class="card">
+          <h2>News — Highlights <span class="tag">(all links open in new tab)</span></h2>
+          <div class="cards">
+            <div class="card">
+              <h3>World</h3>
+              <div class="news-item"><img src="https://www.cnbc.com/favicon.ico" alt="CNBC"><a href="https://www.cnbc.com/world/" target="_blank" rel="noopener">CNBC World</a></div>
+              <div class="news-item"><img src="https://www.cnn.com/favicon.ico" alt="CNN"><a href="https://www.cnn.com/world" target="_blank" rel="noopener">CNN World</a></div>
+              <div class="news-item"><img src="https://www.bbc.com/favicon.ico" alt="BBC"><a href="https://www.bbc.com/news/world" target="_blank" rel="noopener">BBC World</a></div>
+              <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico" alt="Bloomberg"><a href="https://www.bloomberg.com/world" target="_blank" rel="noopener">Bloomberg World</a></div>
+            </div>
+            <div class="card">
+              <h3>United States</h3>
+              <div class="news-item"><img src="https://www.cnbc.com/favicon.ico" alt="CNBC"><a href="https://www.cnbc.com/us-news/" target="_blank" rel="noopener">CNBC U.S.</a></div>
+              <div class="news-item"><img src="https://www.cnn.com/favicon.ico" alt="CNN"><a href="https://www.cnn.com/us" target="_blank" rel="noopener">CNN U.S.</a></div>
+              <div class="news-item"><img src="https://www.bbc.com/favicon.ico" alt="BBC"><a href="https://www.bbc.com/news/world/us_and_canada" target="_blank" rel="noopener">BBC U.S.</a></div>
+              <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico" alt="Bloomberg"><a href="https://www.bloomberg.com/markets/economics" target="_blank" rel="noopener">Bloomberg Economics</a></div>
+            </div>
+            <div class="card">
+              <h3>Thailand</h3>
+              <div class="news-item"><img src="https://www.ryt9.com/favicon.ico" alt="RYT9"><a href="https://www.ryt9.com/" target="_blank" rel="noopener">RYT9 (TH)</a></div>
+              <div class="news-item"><img src="https://www.cnbc.com/favicon.ico" alt="CNBC"><a href="https://www.cnbc.com/world/?region=asia" target="_blank" rel="noopener">CNBC Asia</a></div>
+              <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico" alt="Bloomberg"><a href="https://www.bloomberg.com/asia" target="_blank" rel="noopener">Bloomberg Asia</a></div>
+            </div>
+            <div class="card">
+              <h3>Japan</h3>
+              <div class="news-item"><img src="https://www3.nhk.or.jp/favicon.ico" alt="NHK"><a href="https://www3.nhk.or.jp/nhkworld/en/news/" target="_blank" rel="noopener">NHK World (EN)</a></div>
+              <div class="news-item"><img src="https://www.cnbc.com/favicon.ico" alt="CNBC"><a href="https://www.cnbc.com/japan/" target="_blank" rel="noopener">CNBC Japan</a></div>
+              <div class="news-item"><img src="https://www.bbc.com/favicon.ico" alt="BBC"><a href="https://www.bbc.com/news/world/asia/japan" target="_blank" rel="noopener">BBC Japan</a></div>
+              <div class="news-item"><img src="https://www.cnn.com/favicon.ico" alt="CNN"><a href="https://edition.cnn.com/asia" target="_blank" rel="noopener">CNN Asia</a></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PRODUCTS -->
+        <section id="products" class="card">
+          <div class="toolbar" style="justify-content:space-between">
+            <h2>Products — up to 10 tiles</h2>
+            <div class="toolbar">
+              <button id="addInstrument">Add</button>
+            </div>
+          </div>
+          <div class="products-grid" id="prodGrid"></div>
+          <div class="tag" style="margin-top:6px">Price & % change are displayed inside each TradingView mini tile.</div>
+        </section>
+
+        <!-- ECONOMIC CALENDAR -->
+        <section id="calendar" class="card">
+          <h2>Economic Calendar — High Impact (US/JP/TH)</h2>
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+            {
+              "height": 520, "locale":"en", "importanceFilter":"2,3",
+              "countryFilter":"US,JP,TH",
+              "colorTheme":"dark", "isTransparent": true, "timezone":"Asia/Bangkok"
+            }
+            </script>
+          </div>
+          <div class="tag">Announced numbers are highlighted with Actual / Forecast / Previous.</div>
+        </section>
+
+        <!-- MARKET SUMMARY -->
+        <section id="summary" class="card">
+          <h2>Market Summary — SET</h2>
+          <div class="row two">
+            <div class="card">
+              <h3>SET: Trading by Investor Type</h3>
+              <div class="iframeWrap">
+                <iframe src="https://www.set.or.th/th/market/statistics/investor-type" title="SET Investor Types" style="width:100%; height:100%; border:0;" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                <div class="iframeFallback" hidden>
+                  <a class="link-btn" href="https://www.set.or.th/th/market/statistics/investor-type" target="_blank" rel="noopener">Open in new tab</a>
+                </div>
+              </div>
+              <p class="note">If the embed is blocked, use the button to open it.</p>
+            </div>
+            <div class="card">
+              <h3>SETTRADE: Market Summary Overview</h3>
+              <div class="iframeWrap">
+                <iframe src="https://www.settrade.com/th/equities/market-summary/overview" title="SETTRADE Overview" style="width:100%; height:100%; border:0;" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                <div class="iframeFallback" hidden>
+                  <a class="link-btn" href="https://www.settrade.com/th/equities/market-summary/overview" target="_blank" rel="noopener">Open in new tab</a>
+                </div>
+              </div>
+              <p class="note">If the embed is blocked, use the button to open it.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- DAILY PLAN (manual now, API-ready later) -->
+        <section id="plan" class="card">
+          <h2>Daily Trading Plan (Manual for now)</h2>
+          <p class="note">
+            This prototype saves your plan locally in your browser. To have ChatGPT calculate Entry/SL/TP in real-time,
+            we’ll later connect an API (requires a free account key). For now, fill these boxes:
+          </p>
+          <div class="row two">
+            <div class="card">
+              <h3>XAUUSD — Plan</h3>
+              <label class="tag">Entry / SL / TP / Notes</label>
+              <textarea id="plan_xau"></textarea>
+            </div>
+            <div class="card">
+              <h3>TFEX SET50 Futures — Plan</h3>
+              <label class="tag">Entry / SL / TP / Notes</label>
+              <textarea id="plan_s50"></textarea>
+            </div>
+          </div>
+          <div class="toolbar" style="margin-top:8px">
+            <button id="clearPlans">Clear</button>
+            <a class="link-btn" href="https://platform.openai.com/" target="_blank" rel="noopener">How to connect ChatGPT (guide)</a>
+          </div>
+        </section>
+
+      </div>
+    </main>
   </div>
-  <div class="content">
-    <section id="news">
-      <h2>Highlighted News</h2>
-      <div class="card">
-        <h3>World</h3>
-        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/world/">CNBC</a></div>
-        <div class="news-item"><img src="https://www.cnn.com/favicon.ico"><a href="https://www.cnn.com/world">CNN</a></div>
-        <div class="news-item"><img src="https://www.bbc.com/favicon.ico"><a href="https://www.bbc.com/news/world">BBC</a></div>
-        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/world">Bloomberg</a></div>
-      </div>
-      <div class="card">
-        <h3>U.S.</h3>
-        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/us-news/">CNBC US</a></div>
-        <div class="news-item"><img src="https://www.cnn.com/favicon.ico"><a href="https://www.cnn.com/us">CNN US</a></div>
-        <div class="news-item"><img src="https://www.bbc.com/favicon.ico"><a href="https://www.bbc.com/news/world/us_and_canada">BBC US</a></div>
-        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/markets/economics">Bloomberg Economics</a></div>
-      </div>
-      <div class="card">
-        <h3>Thailand</h3>
-        <div class="news-item"><img src="https://www.ryt9.com/favicon.ico"><a href="https://www.ryt9.com/en/">RYT9</a></div>
-        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/world/?region=asia">CNBC Asia</a></div>
-        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/asia">Bloomberg Asia</a></div>
-      </div>
-      <div class="card">
-        <h3>Japan</h3>
-        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/japan/">CNBC Japan</a></div>
-        <div class="news-item"><img src="https://www.bbc.com/favicon.ico"><a href="https://www.bbc.com/news/world/asia/japan">BBC Japan</a></div>
-        <div class="news-item"><img src="https://www.cnn.com/favicon.ico"><a href="https://edition.cnn.com/asia">CNN Asia</a></div>
-        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/asia">Bloomberg Asia</a></div>
-      </div>
-      <div class="card">
-        <h3>Finance & Investment</h3>
-        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/markets/">CNBC Markets</a></div>
-        <div class="news-item"><img src="https://www.cnn.com/favicon.ico"><a href="https://edition.cnn.com/business">CNN Business</a></div>
-        <div class="news-item"><img src="https://www.bbc.com/favicon.ico"><a href="https://www.bbc.com/news/business">BBC Business</a></div>
-        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/markets">Bloomberg Markets</a></div>
-      </div>
-    </section>
 
-    <section id="products">
-      <h2>Products</h2>
-      <div class="products-grid" id="productGrid"></div>
-    </section>
+  <footer>
+    <small>Widgets: TradingView. News sources: CNBC, CNN, BBC, Bloomberg, RYT9, NHK World. All links open in a new tab. • Local time: <span id="clock"></span></small>
+  </footer>
 
-    <section id="calendar">
-      <h2>Economic Calendar (US)</h2>
-      <div class="card">
-        <iframe src="https://www.tradingview.com/embed-widget/events/?locale=en#%7B%22filter%22%3A%7B%22country%22%3A%5B%22US%22%5D%2C%22importance%22%3A%5B2%2C3%5D%7D%7D"
-          width="100%" height="400" frameborder="0"></iframe>
-      </div>
-    </section>
+  <script src="https://s3.tradingview.com/tv.js"></script>
+  <script>
+    // ===== Theme toggle (default NIGHT)
+    const THEME_KEY='mp_theme';
+    const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+    document.body.setAttribute('data-theme', savedTheme==='dark' ? 'dark' : 'light');
+    document.getElementById('theme').onclick = () => {
+      const cur = document.body.getAttribute('data-theme');
+      const next = cur==='dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      localStorage.setItem(THEME_KEY, next);
+      setTimeout(renderProducts, 100);
+    };
 
-    <section id="summary">
-      <h2>Market Summary (SET)</h2>
-      <div class="card">
-        <iframe src="https://www.set.or.th/en/market/statistics/investor-type" width="100%" height="400" frameborder="0"></iframe>
-        <p><a href="https://www.set.or.th/en/market/statistics/investor-type" target="_blank">Open in new tab</a></p>
-      </div>
-    </section>
-  </div>
-</div>
+    // ===== Clock
+    function tick(){
+      const now = new Date().toLocaleString('en-GB',{timeZone:'Asia/Bangkok',hour12:false});
+      document.getElementById('now').textContent = now;
+      document.getElementById('clock').textContent = now;
+    }
+    tick(); setInterval(tick, 1000);
 
-<script>
-const DEFAULT_INSTRUMENTS = ["OANDA:XAUUSD", "SET:SET50", "SET:SET", "OANDA:USDTHB", "BINANCE:BTCUSDT"];
-function renderProducts() {
-  const grid = document.getElementById('productGrid');
-  grid.innerHTML = '';
-  DEFAULT_INSTRUMENTS.forEach(sym => {
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `<div class="tradingview-widget-container">
-      <iframe src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(sym)}&interval=15&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=[]&hideideas=1&theme=light"
-      width="100%" height="250" frameborder="0"></iframe></div>`;
-    grid.appendChild(div);
-  });
-}
-function toggleTheme() {
-  document.body.classList.toggle('dark');
-  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-}
-if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
-renderProducts();
-</script>
+    // ===== Products logic
+    const STORAGE_KEY = 'mp_products_v2';
+    const DEFAULTS = [
+      { title:"XAUUSD", symbol:"OANDA:XAUUSD" },
+      { title:"S50U2025", symbol:"TFEX:S50U2025" },
+      { title:"USDJPY", symbol:"OANDA:USDJPY" },
+      { title:"THAI", symbol:"SET:THAI" }
+    ];
+    let products = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || DEFAULTS;
+
+    function renderProducts(){
+      const grid = document.getElementById('prodGrid');
+      grid.innerHTML='';
+      products.slice(0,10).forEach((p, idx)=>{
+        const card = document.createElement('div');
+        card.className='prod-card';
+        card.innerHTML = `
+          <div class="prod-head">
+            <div class="prod-name">${p.title}</div>
+            <div class="tag">${p.symbol}</div>
+          </div>
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {
+              "symbol": "${p.symbol}",
+              "width": "100%",
+              "height": "220",
+              "locale": "en",
+              "dateRange": "1D",
+              "colorTheme": "${document.body.getAttribute('data-theme')==='dark'?'dark':'light'}",
+              "isTransparent": true,
+              "autosize": true
+            }
+            </script>
+          </div>
+          <div class="toolbar" style="margin-top:6px">
+            <button data-idx="${idx}" class="remove">Remove</button>
+            <a class="link-btn" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(p.symbol)}" target="_blank" rel="noopener">Open on TradingView</a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      // attach remove actions
+      grid.querySelectorAll('button.remove').forEach(btn=>{
+        btn.addEventListener('click',(e)=>{
+          const i = parseInt(e.target.getAttribute('data-idx'));
+          products.splice(i,1);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+          renderProducts();
+        });
+      });
+    }
+
+    document.getElementById('addInstrument').addEventListener('click', ()=>{
+      if(products.length >= 10){ alert('You can display up to 10 product tiles. Remove one to add another.'); return; }
+      const title = prompt('Instrument title (e.g., EURUSD)');
+      if(!title) return;
+      const symbol = prompt('TradingView symbol (e.g., OANDA:EURUSD, SET:SETBANK, TFEX:S50Z2025)');
+      if(!symbol) return;
+      products.push({ title, symbol });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+      renderProducts();
+    });
+
+    renderProducts();
+
+    // ===== Plans (local storage)
+    const PX='mp_plan_xau', PS='mp_plan_s50';
+    const x = document.getElementById('plan_xau');
+    const s = document.getElementById('plan_s50');
+    x.value = localStorage.getItem(PX) || '';
+    s.value = localStorage.getItem(PS) || '';
+    x.addEventListener('input', ()=>localStorage.setItem(PX, x.value));
+    s.addEventListener('input', ()=>localStorage.setItem(PS, s.value));
+    document.getElementById('clearPlans').addEventListener('click', ()=>{
+      if(confirm('Clear both plans?')){
+        localStorage.removeItem(PX); localStorage.removeItem(PS);
+        x.value=''; s.value='';
+      }
+    });
+
+    // ===== Force all non-side links to open in a new tab
+    document.querySelectorAll('a[href]').forEach(a=>{
+      if(!a.classList.contains('nav')){
+        a.setAttribute('target','_blank'); a.setAttribute('rel','noopener');
+      }
+    });
+  </script>
 </body>
 </html>
