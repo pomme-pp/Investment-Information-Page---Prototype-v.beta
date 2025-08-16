@@ -3,124 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Market Dashboard Prototype</title>
+  <title>Market Page v0.4</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f5f5f5;
-      color: #333;
-      transition: background-color 0.3s, color 0.3s;
+      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg); color: var(--fg); transition: background 0.3s, color 0.3s;
     }
-    header {
-      background-color: #004080;
-      color: white;
-      padding: 15px;
-      text-align: center;
+    :root {
+      --bg: #ffffff; --fg: #111; --accent: #0077cc; --sidebar-bg: #f7f7f7;
     }
-    .theme-toggle {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: white;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
+    body.dark {
+      --bg: #222; --fg: #eee; --accent: #3399ff; --sidebar-bg: #333;
     }
-    .container {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+    .container { display: flex; height: 100vh; }
+    .sidebar {
+      width: 200px; background: var(--sidebar-bg); padding: 1rem 0;
+      display: flex; flex-direction: column; gap: 1rem;
     }
-    .card {
-      background: white;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    .sidebar a {
+      color: var(--fg); text-decoration: none; padding: 0.5rem 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
     }
-    iframe {
-      width: 100%;
-      border: none;
-      height: 400px;
+    .sidebar a:hover { background: var(--accent); color: #fff; }
+    .content { flex: 1; overflow-y: auto; padding: 1rem 2rem; }
+    h2 { margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 0.3rem; }
+    .news-item {
+      display: flex; align-items: center; gap: 0.5rem; margin: 0.3rem 0;
     }
-    .dark-mode {
-      background-color: #1e1e1e;
-      color: #ddd;
+    .news-item img { width: 16px; height: 16px; }
+    .products-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;
     }
-    .dark-mode header {
-      background-color: #222;
-    }
-    .dark-mode .card {
-      background: #2e2e2e;
-      color: #ddd;
-    }
+    .card { border: 1px solid #ccc; padding: 0.5rem; border-radius: 4px; background: var(--sidebar-bg); }
+    .theme-toggle { margin: 1rem; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>My Market Dashboard</h1>
-    <button class="theme-toggle" onclick="toggleTheme()">Day/Night</button>
-  </header>
-  <div class="container">
-    <div class="card">
-      <h2>SET Investor Types</h2>
-      <iframe src="https://www.set.or.th/en/market/statistics/investor-type"></iframe>
-      <p>If not visible, <a href="https://www.set.or.th/en/market/statistics/investor-type" target="_blank">open here</a>.</p>
-    </div>
-    <div class="card">
-      <h2>Gold Price (XAUUSD)</h2>
-      <div class="tradingview-widget-container">
-        <div id="tradingview_gold"></div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Economic Calendar</h2>
-      <div class="tradingview-widget-container">
-        <div id="economic_calendar"></div>
-      </div>
-    </div>
+<div class="container">
+  <div class="sidebar">
+    <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
+    <a href="#news">📰 News</a>
+    <a href="#products">📈 Products</a>
+    <a href="#calendar">📅 Calendar</a>
+    <a href="#summary">📊 Market Summary</a>
   </div>
+  <div class="content">
+    <section id="news">
+      <h2>Highlighted News</h2>
+      <div class="card">
+        <h3>World</h3>
+        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/world/">CNBC</a></div>
+        <div class="news-item"><img src="https://www.cnn.com/favicon.ico"><a href="https://www.cnn.com/world">CNN</a></div>
+        <div class="news-item"><img src="https://www.bbc.com/favicon.ico"><a href="https://www.bbc.com/news/world">BBC</a></div>
+        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/world">Bloomberg</a></div>
+      </div>
+      <div class="card">
+        <h3>U.S.</h3>
+        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/us-news/">CNBC US</a></div>
+        <div class="news-item"><img src="https://www.cnn.com/favicon.ico"><a href="https://www.cnn.com/us">CNN US</a></div>
+        <div class="news-item"><img src="https://www.bbc.com/favicon.ico"><a href="https://www.bbc.com/news/world/us_and_canada">BBC US</a></div>
+        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/markets/economics">Bloomberg Economics</a></div>
+      </div>
+      <div class="card">
+        <h3>Thailand</h3>
+        <div class="news-item"><img src="https://www.ryt9.com/favicon.ico"><a href="https://www.ryt9.com/en/">RYT9</a></div>
+        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/world/?region=asia">CNBC Asia</a></div>
+        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/asia">Bloomberg Asia</a></div>
+      </div>
+      <div class="card">
+        <h3>Japan</h3>
+        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/japan/">CNBC Japan</a></div>
+        <div class="news-item"><img src="https://www.bbc.com/favicon.ico"><a href="https://www.bbc.com/news/world/asia/japan">BBC Japan</a></div>
+        <div class="news-item"><img src="https://www.cnn.com/favicon.ico"><a href="https://edition.cnn.com/asia">CNN Asia</a></div>
+        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/asia">Bloomberg Asia</a></div>
+      </div>
+      <div class="card">
+        <h3>Finance & Investment</h3>
+        <div class="news-item"><img src="https://www.cnbc.com/favicon.ico"><a href="https://www.cnbc.com/markets/">CNBC Markets</a></div>
+        <div class="news-item"><img src="https://www.cnn.com/favicon.ico"><a href="https://edition.cnn.com/business">CNN Business</a></div>
+        <div class="news-item"><img src="https://www.bbc.com/favicon.ico"><a href="https://www.bbc.com/news/business">BBC Business</a></div>
+        <div class="news-item"><img src="https://www.bloomberg.com/favicon.ico"><a href="https://www.bloomberg.com/markets">Bloomberg Markets</a></div>
+      </div>
+    </section>
 
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-  {
-    "symbol": "OANDA:XAUUSD",
-    "width": "100%",
-    "height": "300",
-    "locale": "en",
-    "dateRange": "1D",
-    "colorTheme": "light",
-    "trendLineColor": "rgba(41, 98, 255, 1)",
-    "underLineColor": "rgba(41, 98, 255, 0.3)",
-    "isTransparent": false,
-    "autosize": true,
-    "largeChartUrl": ""
-  }
-  </script>
+    <section id="products">
+      <h2>Products</h2>
+      <div class="products-grid" id="productGrid"></div>
+    </section>
 
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-  {
-    "colorTheme": "light",
-    "isTransparent": false,
-    "width": "100%",
-    "height": "400",
-    "locale": "en",
-    "importanceFilter": "-1,0,1",
-    "countryFilter": "us,th,jp"
-  }
-  </script>
+    <section id="calendar">
+      <h2>Economic Calendar (US)</h2>
+      <div class="card">
+        <iframe src="https://www.tradingview.com/embed-widget/events/?locale=en#%7B%22filter%22%3A%7B%22country%22%3A%5B%22US%22%5D%2C%22importance%22%3A%5B2%2C3%5D%7D%7D"
+          width="100%" height="400" frameborder="0"></iframe>
+      </div>
+    </section>
 
-  <script>
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-    }
-    window.onload = function() {
-      if(localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-      }
-    };
-  </script>
+    <section id="summary">
+      <h2>Market Summary (SET)</h2>
+      <div class="card">
+        <iframe src="https://www.set.or.th/en/market/statistics/investor-type" width="100%" height="400" frameborder="0"></iframe>
+        <p><a href="https://www.set.or.th/en/market/statistics/investor-type" target="_blank">Open in new tab</a></p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const DEFAULT_INSTRUMENTS = ["OANDA:XAUUSD", "SET:SET50", "SET:SET", "OANDA:USDTHB", "BINANCE:BTCUSDT"];
+function renderProducts() {
+  const grid = document.getElementById('productGrid');
+  grid.innerHTML = '';
+  DEFAULT_INSTRUMENTS.forEach(sym => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `<div class="tradingview-widget-container">
+      <iframe src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(sym)}&interval=15&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=[]&hideideas=1&theme=light"
+      width="100%" height="250" frameborder="0"></iframe></div>`;
+    grid.appendChild(div);
+  });
+}
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+}
+if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+renderProducts();
+</script>
 </body>
 </html>
